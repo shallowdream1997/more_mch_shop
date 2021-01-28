@@ -139,61 +139,13 @@ class OrderSubmitForm extends OrderForm
             }
             if ($order->save()) {
 
-                //处理订单生成之后对接一小时用户下单接口start
-                if ($order->mch_id){
-                    $store = Mch::findOne(['id'=>$order->mch_id]);
-                }
-                if ($order->pay_type == 1){
-                    $pay_type = 'wechat';
-                }elseif ($order->pay_type == 3){
-                    $pay_type = 'user_wallet';
-                }
-
-                $data = [
-                    'order_sn' => $order->order_sn,
-                    'store_id' => $store->account_shop_id ? $store->account_shop_id : Mch::IS_ACCOUNT_SHOP_ID,
-                    'pay_type' => $pay_type,
-                    'price' => $order->pay_price,
-                    'membership_info_id' => \Yii::$app->user->identity->membership_info_id,
-                ];
-                $curl = CurlHelper::post('storemall/order/order',$data);
-                $anhourdata = json_decode($curl,true);
-                if ($anhourdata['error_code'] == 0){
-                    $order->anhour_api_text = '订单编号：'.$anhourdata['order']['order_sn'].' 会员ID：'.$anhourdata['order']['membership_info_id'].' 创建时间：'.$anhourdata['order']['create_time'].' 状态值：'.$anhourdata['order']['status'];
-                    $order->save();
-                }
-                //end
-
                 // 处理订单生成之后其他相关数据
                 $orderRes = $this->insertData($mch, $order);
-
-
-                if ($this->store->is_open_isv){
-                    // 用友---下单接口
-                    $this->YongyouOSaleOrderCreate($order);
-                    //用友--销货单
-                    $this->YongyouOSaleDeliveryCreate($order);
-                }
-                //耗时太长了,花了2.5216538906097s
-                //优化之后，2.0100111961365s左右
-                //用友 end
 
                 if ($orderRes['code'] == 1) {
                     $t->rollBack();
                     return $orderRes;
                 }
-
-//                \Yii::$app->task->create(OrderIsv::className(), 10, [
-//                    // 任务自定义参数，选填，将在执行TaskRunnable->run()传入
-//                    'order_id' => $order->id,
-//                    'order_no' => $order->order_no,
-//                    'address' => $order->address,
-//                    'name' => $order->name,
-//                    'mobile' => $order->mobile,
-//                    'remark' => $order->remark,
-//                    'order_type' => 'STORE',
-//                    'store_id' => $this->getCurrentStoreId(),
-//                ], '商城订单ISV下单和销货');
 
                 $printer_order = new PinterOrder($this->store_id, $order->id, 'order', 0, $order->mch_id);
                 $printer_order->print_order();
@@ -241,109 +193,6 @@ class OrderSubmitForm extends OrderForm
             $t->rollBack();
             return $this->getErrorResponse($order);
         }
-    }
-
-    //下单销售订单新增
-    private function YongyouOSaleOrderCreate($order)
-    {
-        $yyisv = new TplusOption();
-        $od = OrderDetail::find()->alias('od')->leftJoin(['g'=>Goods::tableName()],'g.id=od.goods_id')
-        ->where(['od.order_id'=>$order->id,'od.is_delete'=>OrderDetail::ORDER_IS_SHOW])->select('od.*,g.unit')->asArray()->all();
-        //商品价格 total_price
-        $SaleOrderDetails = self::getSaleOrderDetails($od);
-        $apiParm = [
-            '_args' => json_encode([
-                'dto' => [
-                    'VoucherDate'      => date("Y-m-d",time()),
-                    'ExternalCode'     => $order->order_no, // 外部系统单据编码，编码必须唯一，且此字段不为空
-                    'Customer'         => ['Code' => 'AH08003-1'], // 客户编码 此编码要与T+系统客户编码一致 AH08003-1 AH08005-1 AH08006-1 AH10001-1
-                    'Address'          => $order->address,
-                    'LinkMan'          => $order->name,
-                    'ContactPhone'     => $order->mobile,
-                    'Memo'             => $order->remark,
-                    'ExchangeRate'     => (5 / 100),//汇率，decimal类型
-                    'SaleOrderDetails' => $SaleOrderDetails,
-                ],
-            ], JSON_UNESCAPED_UNICODE),
-        ];
-        $argList = $yyisv::Options('/saleOrder/Create',$apiParm);
-    }
-
-    private function getSaleOrderDetails($od)
-    {
-        $SaleOrderDetails = [];
-        foreach ($od as $i => $k){
-            //获取存货编码，这里写死一个测试
-            $SaleOrderDetails[$i]['Inventory']        = ['Code'=>'100145'];
-            //计量单位信息
-            $SaleOrderDetails[$i]['Unit']             = ['Name'=>$k['unit']];
-            //数量，decimal类型
-            $SaleOrderDetails[$i]['Quantity']         = $k['num'];
-            //价格
-            $SaleOrderDetails[$i]['OrigPrice']        = $k['total_price'];//商品价格 total_price
-            //换算率，decimal类型
-            $SaleOrderDetails[$i]['UnitExchangeRate'] = (5 / 100) ;
-            //税率,decimal类型 OrigTaxPrice
-            $SaleOrderDetails[$i]['TaxRate']          = (5 / 100);
-            $SaleOrderDetails[$i]['OrigTaxPrice']     = (5 / 100) * $k['total_price'];
-            $SaleOrderDetails[$i]['OrigDiscountAmount'] = (5 / 100) * $k['total_price'];
-            $SaleOrderDetails[$i]['OrigTax'] = (5 / 100) * $k['total_price'];
-            $SaleOrderDetails[$i]['OrigTaxAmount'] = (5 / 100) * $k['total_price'];
-            //折扣率,decimal类型 OrigDiscountPrice
-            $SaleOrderDetails[$i]['DiscountRate']     = (5 / 100);
-            $SaleOrderDetails[$i]['OrigDiscountPrice']= (5 / 100) * $k['total_price'];
-        }
-        return $SaleOrderDetails;
-    }
-    /*
-     *
-     * 新增销货单 TPlus/api/v1/saleDelivery/Create
-     *
-     * */
-    private function YongyouOSaleDeliveryCreate($order)
-    {
-        $yyisv = new TplusOption();
-        $od = OrderDetail::find()->alias('od')->leftJoin(['g'=>Goods::tableName()],'g.id=od.goods_id')
-            ->where(['od.order_id'=>$order->id,'od.is_delete'=>OrderDetail::ORDER_IS_SHOW])->select('od.*,g.unit')->asArray()->all();
-        //商品价格 total_price
-        $SaleDeliveryDetails = self::getSaleDeliveryDetails($od);
-        $apiParm = [
-            '_args' => json_encode([
-                'dto' => [
-                    'VoucherDate'      => date("Y-m-d",time()),
-                    'ExternalCode'     => $order->order_no, // 外部系统单据编码，编码必须唯一，且此字段不为空
-                    'Customer'         => ['Code' => 'AH08003-1'], // 客户编码 此编码要与T+系统客户编码一致 AH08003-1 AH08005-1 AH08006-1 AH10001-1
-                    'InvoiceType'      => ['Code' => '00'],
-                    'Address'          => $order->address,
-                    'LinkMan'          => $order->name,
-                    'ContactPhone'     => $order->mobile,
-                    'Memo'             => $order->remark,
-                    'SaleDeliveryDetails' => $SaleDeliveryDetails,
-                ],
-            ], JSON_UNESCAPED_UNICODE),
-        ];
-        $argList = $yyisv::Options('/saleDelivery/Create',$apiParm);
-    }
-
-    private function getSaleDeliveryDetails($od)
-    {
-        $SaleDeliveryDetails = [];
-        foreach ($od as $i => $k){
-            //获取存货编码，这里写死一个测试
-            $SaleDeliveryDetails[$i]['Inventory']        = ['Code'=>'100145'];
-            //计量单位信息
-            $SaleDeliveryDetails[$i]['Unit']             = ['Name'=>$k['unit']];
-            //数量，decimal类型
-            $SaleDeliveryDetails[$i]['Quantity']         = $k['num'];
-            //价格
-            $SaleDeliveryDetails[$i]['OrigPrice']        = $k['total_price'];//商品价格 total_price
-            $SaleDeliveryDetails[$i]['OrigTaxAmount']    = $k['total_price'];//商品价格 total_price
-            // $SaleDeliveryDetails[$i]['OrigDiscountPrice'] = $k['total_price'];
-            // $SaleDeliveryDetails[$i]['OrigDiscountAmount'] = $k['total_price'];
-            // $SaleDeliveryDetails[$i]['OrigDiscount']     = $k['total_price'];
-
-        }
-        return $SaleDeliveryDetails;
     }
 
     // 获得实际支付金额

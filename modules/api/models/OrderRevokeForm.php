@@ -63,18 +63,6 @@ class OrderRevokeForm extends ApiModel
                 ];
             }
 
-            ////对接用友T+销售订单删除接口
-//            $yyisv = new TplusOption();
-//            $apiParm = [
-//                '_args' => json_encode([
-//                    'dto' => [
-//                        'ExternalCode' => $order->order_no,
-//                    ],
-//                ], JSON_UNESCAPED_UNICODE),
-//            ];
-//            $args = $yyisv::Options('/saleOrder/Delete',$apiParm);
-            ////对接用友T+销售订单删除接口
-
         }
         $order = Order::findOne([
             'store_id' => $this->store_id,
@@ -121,42 +109,7 @@ class OrderRevokeForm extends ApiModel
                 array_push($attr_id_list, $item->attr_id);
             }
             $goods->numAdd($attr_id_list, $order_detail->num);
-            /*
-            if (!$goods->numAdd($attr_id_list, $order_detail->num)) {
-                $t->rollBack();
-                return [
-                    'code' => 1,
-                    'msg' => '订单取消失败，库存操作失败',
-                ];
-            }
-            */
-          //  $stockNum += $order_detail->num;
         }
-
-        //出库单-- saleDispatch/Create
-//        $yyisv = new TplusOption();
-//        $apiParm = [
-//            '_args' => json_encode([
-//                'dto' => [
-//                    'ExternalCode' => $order->order_no,//外部系统数据编号；OpenAPI调用者填写,后台做唯一性检查。用于防止重复提交，和外系统数据对应。
-//                    'Code' => 'SO-2020-06-0019',//单据编码 此处写死测试的 SO-2020-06-0001 SO-2020-06-0002 SO-2020-06-0003 SO-2020-06-0004 SO-2020-06-0005
-//                    'VoucherType' => ['Code'=>'ST1021'],
-//                    'Customer' => ['Code'=>'AH08003-1'],
-//                    'VoucherDate' => date("Y-m-d",time()),
-//                    'BusiType' => ['Code' =>'16'], //业务类型。默认值： {Code: "15"},取值范围：15 销售出库，16 销售退库
-//                    'Warehouse' => ['Code'=>'015'], //仓库信息 测试先写死
-//                    'Memo' => '销售退库',
-//                    'RDRecordDetails' => [
-//                        'Code'=>'1001',
-//                        'Inventory'=>[
-//                            'Code'=>'100145'
-//                        ],
-//                        'BaseQuantity' => '-'.$stockNum
-//                    ],
-//                ],
-//            ], JSON_UNESCAPED_UNICODE),
-//        ];
-//        $argList = $yyisv::Options('/saleDispatch/Create',$apiParm);
 
         // 活力币恢复
         if($order->type == 5 && $order->currency > 0){

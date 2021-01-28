@@ -190,8 +190,7 @@ class OrderWarn extends Model
             //支付成功赠送卡券
             $this->paySendCard($order->store_id, $order->user_id, $order->id);
         }
-        //用户支付之后对接一小时系统用户支付
-        $this->AnhourpayOrder($order);
+
         //写入销售总额统计表
         self::addMchTongji($order);
         return true;
@@ -217,41 +216,6 @@ class OrderWarn extends Model
             $Mch->month_order_sum = $order->pay_price;
             $Mch->save();
         }
-    }
-
-    //用户支付之后对接一小时系统用户支付
-    public function AnhourpayOrder($order)
-    {
-        //用户支付之后对接一小时系统用户支付start
-        $user = User::findOne(['id'=>$order->user_id]);
-        if ($order->mch_id){
-            $store = Mch::findOne(['id'=>$order->mch_id]);
-        }
-        if ($order->pay_type == 1){
-            $pay_type = 'wechat';
-            $transaction_id = $order->order_no;
-        }elseif ($order->pay_type == 3){
-            $pay_type = 'user_wallet';
-        }
-
-        $data = [
-            'order_sn' => $order->order_sn,
-            'store_id' => $store->account_shop_id ? $store->account_shop_id : Mch::IS_ACCOUNT_SHOP_ID,
-            'pay_type' => $pay_type,
-            'price' => $order->pay_price,
-            'transaction_id' => $transaction_id ? $transaction_id : '',
-            'membership_info_id' => $user->membership_info_id,
-        ];
-        $curl = CurlHelper::post('storemall/order/payOrder',$data);
-        $anhourdata = json_decode($curl,true);
-        if ($anhourdata['error_code'] == 0){
-            $order->anhour_api_text = '订单编号：'.$anhourdata['order']['order_sn'].' 会员ID：'.$anhourdata['order']['membership_info_id'].' 第三方交易流水 微信回调流水号：'.$anhourdata['order']['transaction_id'].' 状态值：'.$anhourdata['order']['status'];
-            $order->save();
-        }else{
-            $order->anhour_api_text = '订单编号：'.$anhourdata['order']['order_sn'].' 会员ID：'.$anhourdata['order']['membership_info_id'].' 状态值：'.$anhourdata['order']['status'].' 失败原因：'.$anhourdata['error_msg'];
-            $order->save();
-        }
-        //end
     }
 
     //秒杀
