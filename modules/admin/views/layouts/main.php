@@ -7,16 +7,9 @@ use app\modules\admin\models\AdminMenu;
 $version = '1.8.3';
 $url_manager = Yii::$app->urlManager;
 $active_nav_link = isset($this->params['active_nav_link']) ? $this->params['active_nav_link'] : null;
-
-//$logo = Option::get('logo', 0, 'admin', null);
-//$logo = $logo ? $logo : Yii::$app->request->baseUrl . '/statics/admin/images/logo.png';
-
 $copyright = Option::get('copyright', 0, 'admin');
-//$copyright = $copyright ? $copyright : '©2017 <a href="http://www.zjhejiang.com" target="_blank">一小时商城</a>';
-
 $adminMenu = new AdminMenu();
 $adminMenuList = $adminMenu->getMenu();
-
 $urlManager = Yii::$app->urlManager;
 $currentRoute = Yii::$app->controller->route
 ?>
@@ -27,7 +20,7 @@ $currentRoute = Yii::$app->controller->route
     <meta name="renderer" content="webkit">
     <meta http-equiv="X-UA-Compatible" content="IE=Edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=0">
-    <title><?= !empty($this->title) ? $this->title . ' - ' : null ?><?= Option::get('name', 0, 'admin', '一小时商城') ?></title>
+    <title><?= !empty($this->title) ? $this->title . ' - ' : null ?></title>
     <link rel="stylesheet"
           href="<?= Yii::$app->request->baseUrl ?>/statics/admin/css/bootstrap.min.css?v=<?= $version ?>">
     <link rel="stylesheet" href="https://at.alicdn.com/t/font_353057_c9nwwwd9rt7.css">
@@ -55,9 +48,6 @@ $currentRoute = Yii::$app->controller->route
     <script src="<?= Yii::$app->request->baseUrl ?>/statics/mch/vendor/laydate/laydate.js"></script>
 </head>
 <body>
-<script type="text/javascript">
-    window.location.href = 'index.php?r=admin%2Fapp%2Fentry&id=1';
-</script>
 <?= $this->render('/components/pick-link.php') ?>
 <!--无用、防止报错 start-->
 <div id="file" hidden></div>

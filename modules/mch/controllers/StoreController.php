@@ -11,10 +11,12 @@ namespace app\modules\mch\controllers;
 
 use app\hejiang\ApiCode;
 use app\hejiang\cloud\CloudWxappUpload;
+use app\models\AttrErModel;
 use app\models\common\admin\store\CommonAppDisabled;
 use app\models\common\admin\store\CommonStoreUpload;
 use app\models\common\CommonDistrict;
 use app\models\YongyouIsv;
+use app\modules\mch\models\FlashImageForm;
 use app\modules\mch\models\PickLinkForm;
 use app\modules\mch\models\WxForm;
 use app\modules\mch\models\YongyouIsvForm;
@@ -1948,6 +1950,44 @@ class StoreController extends Controller
             return $this->render('upload-oss', [
                 'model' => $model,
             ]);
+        }
+    }
+
+    /**
+     * @return string
+     * 图片素材管理列表
+     */
+    public function actionFlashImage()
+    {
+        if (\Yii::$app->request->isPost){
+
+        }else{
+            $form = new FlashImageForm();
+            $form->store_id = $this->store->id;
+            $list = $form->getFlashList();
+            return $this->render('flash-image', [
+                'list' => $list[0],
+                'pagination' => $list[1],
+            ]);
+        }
+    }
+
+    /**
+     * @return array
+     * 图片素材删除
+     */
+    public function actionFlashDel()
+    {
+        $id = \Yii::$app->request->get('id');
+        $flash = UploadFile::findOne($id);
+        if (!empty($flash)){
+            $flash->is_delete = 1;
+            if ($flash->save()){
+                return [
+                    'code' => 0,
+                    'msg' => '删除成功'
+                ];
+            }
         }
     }
 }
