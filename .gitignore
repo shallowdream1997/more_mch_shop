@@ -1,0 +1,7 @@
+# local phpunit config
+/phpunit.xml
+/runtime
+# hejiang application files
+#install.lock.php
+config/ind_db.php
+#.env
