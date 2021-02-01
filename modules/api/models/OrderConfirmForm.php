@@ -59,19 +59,6 @@ class OrderConfirmForm extends ApiModel
             $order->is_pay = 1;
             $order->pay_time = time();
         }
-/*
-        $user = User::findOne(['id' => $order->user_id, 'store_id' => $this->store_id]);
-        $order_money = Order::find()->where(['store_id' => $this->store_id, 'user_id' => $user->id, 'is_delete' => 0])
-            ->andWhere(['is_pay' => 1, 'is_confirm' => 1])->select([
-                'sum(pay_price)'
-            ])->scalar();
-        $next_level = Level::find()->where(['store_id' => $this->store_id, 'is_delete' => 0,'status'=>1])
-            ->andWhere(['<', 'money', $order_money])->orderBy(['level' => SORT_DESC])->asArray()->one();
-        if ($user->level < $next_level['level']) {
-            $user->level = $next_level['level'];
-            $user->save();
-        }
-*/
 
         if ($order->save()) {
             $printer_order = new PinterOrder($this->store_id, $order->id, 'confirm', 0,$order->mch_id);

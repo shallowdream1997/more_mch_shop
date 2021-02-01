@@ -39,7 +39,7 @@ class OrderRevokeForm extends ApiModel
     {
         return [
             [['order_id'], 'required'],
-            [['anhour','delete'], 'integer'],
+            [['delete'], 'integer'],
         ];
     }
 
@@ -182,9 +182,6 @@ class OrderRevokeForm extends ApiModel
             if ($order->is_pay == 0) {
                 UserCoupon::updateAll(['is_use' => 0], ['id' => $order->user_coupon_id]);
             }
-            if ($this->anhour == 1){
-                $this->AnhourCancel($order);
-            }
             $t->commit();
 
             return [
@@ -200,25 +197,6 @@ class OrderRevokeForm extends ApiModel
         }
     }
 
-    //用户下单取消对接一小时用户取消系统
-    public function AnhourCancel($order)
-    {
-        //处理订单生成之后对接一小时用户取消系统接口start
-        $user = User::findOne(['id'=>$order->user_id]);
-        $store = Mch::findOne(['id'=>$order->mch_id]);
-        $data = [
-            'order_sn' => $order->order_sn,
-            'store_id' => $store->account_shop_id,
-            'membership_info_id' => $user->membership_info_id,
-        ];
-        $curl = CurlHelper::post('storemall/order/cancel',$data);
-        $anhourdata = json_decode($curl,true);
-        if ($anhourdata['error_code'] == 0){
-            $order->anhour_api_text = '订单编号：'.$anhourdata['order']['order_sn'].' 会员ID：'.$anhourdata['order']['membership_info_id'].' 更新时间：'.$anhourdata['order']['update_time'].' 状态值：'.$anhourdata['order']['status'];
-            $order->save();
-        }
-        //end
-    }
     /**
      * 微信支付退款
      * @param $order

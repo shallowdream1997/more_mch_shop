@@ -1022,13 +1022,30 @@ class Menu
             ],
             [
                 'key' => 'mch',
-                'name' => '商户管理',
+                'name' => '商户与门店',
                 'is_menu' => true,
                 'route' => 'mch/mch/index/index',
                 'icon' => 'icon-shanghu',
                 'children' => [
                     [
-                        'name' => '商户列表',
+                        'name' => '账户列表',
+                        'is_menu' => true,
+                        'route' => 'mch/mch/account/index',
+                        'sub' => [
+                            [
+                                'name' => '账户列表编辑',
+                                'is_menu' => false,
+                                'route' => 'mch/mch/account/edit',
+                            ],
+                            [
+                                'name' => '账户列表添加',
+                                'is_menu' => false,
+                                'route' => 'mch/mch/account/add',
+                            ]
+                        ],
+                    ],
+                    [
+                        'name' => '门店列表',
                         'is_menu' => true,
                         'route' => 'mch/mch/index/index',
                         'sub' => [

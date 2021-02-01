@@ -139,6 +139,9 @@ $config = [
         'user' => [
             'class' => 'app\modules\user\Module',
         ],
+        'shop' => [
+            'class' => 'app\modules\shop\Module',
+        ],
     ],
     'params' => require __DIR__ . '/params.php',
 ];

@@ -115,6 +115,9 @@ class Model extends \yii\base\Model
                 $userLoginUrl = Yii::$app->urlManager->createAbsoluteUrl(['wechat-platform/bind-user', 'store_id' => $this->getCurrentStoreId()]);
                 $userLoginUrl = str_replace('http://', 'https://', $userLoginUrl);
                 break;
+            case 'shop':
+                $userLoginUrl = $urlManager->hostInfo . $urlManager->baseUrl . '/shop.php?store_id=' . $storeId;
+                break;
             default :
                 $userLoginUrl = '';
         }
