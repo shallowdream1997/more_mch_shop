@@ -30,7 +30,7 @@ class AccountListForm extends MchModel
             [['page', 'limit', 'mch_id'], 'integer'],
             [['keyword',], 'trim'],
             [['page',], 'default', 'value' => 1,],
-            [['limit',], 'default', 'value' => 20,],
+            [['limit',], 'default', 'value' => 10,],
         ];
     }
 
