@@ -56,10 +56,6 @@ $passport_bg = Yii::$app->request->baseUrl . '/statics/mch/images/passport_bg.pn
 <div class="main-box" flex="dir:left main:center cross:center">
     <div class="main-content">
         <div class="title">商户账号登录</div>
-        <input name="_csrf"
-               type="hidden"
-               id="_csrf"
-               value="<?= Yii::$app->request->csrfToken ?>">
         <input class="form-control mb-3 phone" name="phone" placeholder="请输入手机号">
         <input class="form-control mb-3 password" name="password" placeholder="请输入密码" type="password">
         <button class="btn btn-block btn-primary mb-3 login">登录</button>
@@ -69,31 +65,27 @@ $passport_bg = Yii::$app->request->baseUrl . '/statics/mch/images/passport_bg.pn
     </div>
 </div>
 <script>
-    var stop = false;
-    function checkLogin() {
-        if (stop)
-            return;
+    $(document).on('click', '.login', function () {
+        var username = $('.phone').val();
+        var password = $('.password').val();
         $.ajax({
-            url: '<?=Yii::$app->urlManager->createUrl(['shop/passport/check-login',])?>',
-            data: {
-                token: token,
-            },
+            url:'<?=Yii::$app->urlManager->createUrl('shop/passport/login')?>',
+            type: 'post',
             dataType: 'json',
-            success: function (res) {
-                $('.login-tip').text(res.msg);
-                if (res.code == 1) {
-                    stop = true;
-                }
-                if (res.code == 0) {
-                    location.href = '<?=Yii::$app->urlManager->createUrl(['user'])?>';
-                }
-                if (res.code == -1) {
-                    checkLogin();
-                }
+            data: {
+                'username': username,
+                'password': password,
+                _csrf: _csrf,
             },
-            error: function () {
-                stop = true;
+            success:function (res) {
+                if (res.code === 1) {
+                    $.myAlert({
+                        content: res.msg
+                    });
+                }else  {
+                    location.href = "<?= \Yii::$app->urlManager->createUrl('shop/user/me') ?>";
+                }
             }
-        });
-    }
+        })
+    });
 </script>

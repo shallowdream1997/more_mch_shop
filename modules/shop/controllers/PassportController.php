@@ -18,9 +18,8 @@
  */
 namespace app\modules\shop\controllers;
 
-use app\models\Mch;
-use app\models\MchAuthLogin;
-use app\models\User;
+
+use app\modules\shop\models\SLoginForm;
 
 class PassportController extends Controller
 {
@@ -28,8 +27,14 @@ class PassportController extends Controller
 
     public function actionLogin()
     {
-        return $this->render('login');
+        \Yii::$app->session->open();
+        if (\Yii::$app->request->isAjax) {
+            $form = new SLoginForm();
+            $form->attributes = \Yii::$app->request->post();
+            return $form->login();
+        } else {
+            return $this->render('login');
+        }
     }
-
 
 }

@@ -31,13 +31,23 @@ $config = [
                 'httpOnly' => true,
             ],
         ],
-        'mchRoleAdmin' => [
+        'shop' => [
             'class' => 'yii\web\User',
-            'identityClass' => 'app\models\MchRoleAdmin',
+            'identityClass' => 'app\models\AccountMch',
             'enableAutoLogin' => true,
-            'idParam' => '__mchRoleAdmin_id',
+            'idParam' => '__shop_id',
             'identityCookie' => [
-                'name' => '_mchRoleAdmin_identity',
+                'name' => '_shop_identity',
+                'httpOnly' => true,
+            ],
+        ],
+        'mch' => [
+            'class' => 'yii\web\User',
+            'identityClass' => 'app\models\Mch',
+            'enableAutoLogin' => true,
+            'idParam' => '__mch_id',
+            'identityCookie' => [
+                'name' => '_mch_identity',
                 'httpOnly' => true,
             ],
         ],
