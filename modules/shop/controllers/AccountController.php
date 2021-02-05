@@ -22,8 +22,11 @@ namespace app\modules\shop\controllers;
 
 use app\models\Mch;
 use app\modules\shop\behaviors\MchLoginBehavior;
+use app\modules\shop\behaviors\RouteBehavior;
+use app\modules\shop\behaviors\ShopBehavior;
 use app\modules\shop\behaviors\ShopLoginBehavior;
 use yii\data\Pagination;
+use yii\helpers\ArrayHelper;
 
 class AccountController extends Controller
 {
@@ -36,6 +39,9 @@ class AccountController extends Controller
             'mch' => [
                 'class' => MchLoginBehavior::className(),
             ],
+            'route' => [
+                'class' => RouteBehavior::className(),
+            ],
         ];
     }
 
@@ -43,10 +49,10 @@ class AccountController extends Controller
     {
         if (!\Yii::$app->shop->isGuest && !\Yii::$app->mch->isGuest)
         {
-            echo "<pre>";
-            var_dump(\Yii::$app->mch->identity);
-            var_dump(\Yii::$app->shop->identity);
-            exit;
+            $data = ArrayHelper::toArray(\Yii::$app->mch->identity);
+            return $this->render('index',[
+                'mch' => $data,
+            ]);
         }
         $return_utl = \Yii::$app->request->absoluteUrl;
         \Yii::$app->response->redirect(\Yii::$app->urlManager->createUrl(['shop/user/select-mch', 'return_utl' => $return_utl]))->send();

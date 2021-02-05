@@ -79,11 +79,9 @@ $passport_bg = Yii::$app->request->baseUrl . '/statics/mch/images/passport_bg.pn
             },
             success:function (res) {
                 if (res.code === 1) {
-                    $.myAlert({
-                        content: res.msg
-                    });
+                    alert(res.msg)
                 }else  {
-                    location.href = "<?= \Yii::$app->urlManager->createUrl('shop/user/me') ?>";
+                    location.href = "<?= \Yii::$app->urlManager->createUrl('shop/user/select-mch') ?>";
                 }
             }
         })

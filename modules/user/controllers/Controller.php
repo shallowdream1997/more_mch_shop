@@ -81,10 +81,6 @@ class Controller extends \app\controllers\Controller
         ]);
     }
 
-//    public function getMenuList()
-//    {
-//        return MchMenu::getMenu();
-//    }
 
     public function getMenuList()
     {

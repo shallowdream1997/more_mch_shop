@@ -49,4 +49,17 @@ class ShopController extends Controller
             ];
         }
     }
+
+    /**
+     *
+     * 注销
+     */
+    public function actionLoginout()
+    {
+        \Yii::$app->shop->logout();
+        \Yii::$app->response->redirect(\Yii::$app->urlManager->createUrl(['shop/passport/login']))->send();
+        return [
+            'code' => 0,
+        ];
+    }
 }

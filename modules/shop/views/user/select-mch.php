@@ -30,6 +30,9 @@ $urlPlatform = Yii::$app->controller->route;
 <div class="container" id="app">
     <div class="alert alert-info rounded-0" style="margin-top: 25%">
         <p>账户门店选择登陆页面：</p>
+        <p class="panel-danger float-right">
+            <div class="btn btn-success btn-sm" @click="loginout()">注销</div>
+        </p>
         <div class="panel-body">
             <?php if (!$mc || count($mc) == 0) : ?>
                 <div class="p-5 text-center text-muted">暂无门店</div>
@@ -84,6 +87,18 @@ $urlPlatform = Yii::$app->controller->route;
                     success: function (res) {
                         if (res.code == 0) {
                             location.href = '<?=Yii::$app->urlManager->createUrl(['shop/account/index'])?>';
+                        }
+                    }
+                });
+            },
+            loginout(){
+                $.ajax({
+                    url: "<?= $urlManager->createUrl(['shop/shop/loginout'])?>",
+                    type: "get",
+                    data: {},
+                    success: function (res) {
+                        if (res.code == 0){
+                            location.href = "<?= $urlManager->createUrl(['shop/passport/login'])?>"
                         }
                     }
                 });

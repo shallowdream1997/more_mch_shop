@@ -179,8 +179,13 @@ function getCurrentMenu($menu_list, $route)
     <div class="sidebar-1">
         <div class="logo">
             <a class="home-link"
-               href="<?= $urlManager->createUrl(['user']) ?>"><?= $this->context->store->name ?></a>
+               href="<?= $urlManager->createUrl(['shop/account/index']) ?>">
+                <p><?= $this->context->store->name ?></p>
+                <p><?= Yii::$app->mch->identity->realname ?> </p>
+            </a>
         </div>
+        <p></p>
+        <p></p>
         <div>
             <?php foreach ($menu_list as $item) : ?>
                 <a class="nav-item <?= activeMenu($item, $route) ?>"
@@ -235,9 +240,9 @@ function getCurrentMenu($menu_list, $route)
         <div class="float-right">
             <div class="btn-group float-left">
                 <a href="javascript:" class="btn btn-secondary dropdown-toggle"
-                   data-toggle="dropdown"><?= Yii::$app->user->identity->nickname ?></a>
+                   data-toggle="dropdown"><?= Yii::$app->mch->identity->realname ?></a>
                 <div class="dropdown-menu dropdown-menu-right">
-                    <a class="dropdown-item" href="<?= $urlManager->createUrl(['user/passport/logout']) ?>">注销</a>
+                    <a class="dropdown-item" href="<?= $urlManager->createUrl(['shop/user/select-mch']) ?>">注销</a>
                 </div>
             </div>
         </div>

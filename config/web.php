@@ -41,6 +41,16 @@ $config = [
                 'httpOnly' => true,
             ],
         ],
+        'mchRoleAdmin' => [
+            'class' => 'yii\web\User',
+            'identityClass' => 'app\models\MchRoleAdmin',
+            'enableAutoLogin' => true,
+            'idParam' => '__mchRoleAdmin_id',
+            'identityCookie' => [
+                'name' => '_mchRoleAdmin_identity',
+                'httpOnly' => true,
+            ],
+        ],
         'mch' => [
             'class' => 'yii\web\User',
             'identityClass' => 'app\models\Mch',

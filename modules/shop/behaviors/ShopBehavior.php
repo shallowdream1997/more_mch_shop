@@ -38,7 +38,6 @@ class ShopBehavior extends Behavior
             \Yii::$app->end();
         }
 
-
-//        $e->action->controller->mch = $mch;
+        $e->action->controller->shop = $shop;
     }
 }

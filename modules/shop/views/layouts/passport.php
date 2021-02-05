@@ -28,7 +28,6 @@ $urlManager = Yii::$app->urlManager;
     <script>var _csrf = "<?=Yii::$app->request->csrfToken?>";</script>
     <script>var _upload_url = "<?=Yii::$app->urlManager->createUrl(['upload/file'])?>";</script>
     <script>var _district_data_url = "<?=Yii::$app->urlManager->createUrl(['api/default/district', 'store_id' => $this->context->store->id])?>";</script>
-
     <script src="<?= Yii::$app->request->baseUrl ?>/statics/user/js/jquery.min.js"></script>
     <script src="<?= Yii::$app->request->baseUrl ?>/statics/user/js/vue.js"></script>
 </head>

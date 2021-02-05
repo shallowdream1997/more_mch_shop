@@ -23,6 +23,7 @@ namespace app\modules\shop\controllers;
 use app\models\Mch;
 use app\models\Store;
 use app\models\WechatApp;
+use app\modules\shop\models\route\MenuForm;
 use app\modules\user\models\permission\permission\MchRoleMenuForm;
 use luweiss\wechat\Wechat;
 use yii\web\Cookie;
@@ -89,7 +90,7 @@ class Controller extends \app\controllers\Controller
 
     public function getMenuList()
     {
-        $m = new MchRoleMenuForm();
+        $m = new MenuForm();
 
         $res = $m->getList();
 
